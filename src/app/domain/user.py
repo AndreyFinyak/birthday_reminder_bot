@@ -1,11 +1,8 @@
 from dataclasses import dataclass
-from datetime import date
 
 
 @dataclass
-class UserBirthday:
+class User:
     id: int
     telegram_id: int
     username: str | None
-    name: str
-    birthday_date: date

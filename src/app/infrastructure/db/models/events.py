@@ -1,20 +1,18 @@
 from datetime import date
-from typing import TYPE_CHECKING
 
-from sqlalchemy import Date, Enum, ForeignKey, Integer
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Date, Enum, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.domain.enums import EventType
 from app.infrastructure.db.models.base import Base
-
-if TYPE_CHECKING:
-    from app.infrastructure.db.models.users import User
 
 
 class Event(Base):
     __tablename__ = "events"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, autoincrement=True
+    )
     event_type: Mapped["EventType"] = mapped_column(
         Enum(EventType), nullable=False
     )
@@ -24,4 +22,4 @@ class Event(Base):
         Integer, ForeignKey("users.id"), nullable=False
     )
 
-    user: Mapped["User"] = relationship("User", back_populates="events")
+    owner: Mapped[str] = mapped_column(String(50), nullable=False)

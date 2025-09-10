@@ -19,5 +19,5 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(50), nullable=True)
 
     events: Mapped[list["Event"]] = relationship(
-        back_populates="user", cascade="all, delete-orphan"
+        back_populates="owner", cascade="all, delete-orphan"
     )
