@@ -6,6 +6,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     MODE: str
 
+    BOT_TOKEN: str
+
     LOG_LEVEL: str
 
     DB_HOST: str

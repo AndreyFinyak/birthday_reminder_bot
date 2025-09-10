@@ -1,4 +1,4 @@
-exclude: "^docs/|/alembic/"
+exclude: "^docs/|/migrations/"
 default_stages: [pre-commit]
 
 repos:
@@ -46,8 +46,8 @@ repos:
       - id: python-use-type-annotations
       - id: python-check-blanket-noqa
 
-  -   repo: https://github.com/Yelp/detect-secrets
-      rev: v1.4.0
-      hooks:
-      -   id: detect-secrets
-          exclude: '(package\.lock\.json|alembic\.ini|alembic/)'
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        exclude: '(package\.lock\.json|alembic\.ini|alembic/.*|migrations/.*)'
