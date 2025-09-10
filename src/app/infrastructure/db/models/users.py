@@ -1,8 +1,12 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.db.models.base import Base
-from app.infrastructure.db.models.events import Event
+
+if TYPE_CHECKING:
+    from app.infrastructure.db.models.events import Event
 
 
 class User(Base):
