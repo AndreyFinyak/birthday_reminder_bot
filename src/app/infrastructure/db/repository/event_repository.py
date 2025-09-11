@@ -1,3 +1,5 @@
+import logging
+
 from sqlalchemy import delete as sqlalchemy_delete
 from sqlalchemy import select
 from sqlalchemy import update as sqlalchemy_update
@@ -12,6 +14,8 @@ from app.infrastructure.db.mappers.events import (
 )
 from app.infrastructure.db.models import Event
 
+log = logging.getLogger(__name__)
+
 
 class EventRepository:
     @connection
@@ -24,6 +28,9 @@ class EventRepository:
             )
         )
         event = result.scalar_one_or_none()
+
+        log.debug("Event: %s", event)
+
         return event_to_domain(event) if event else None
 
     @connection
@@ -36,7 +43,12 @@ class EventRepository:
 
         orm_event = event_to_orm(event)
         session.add(orm_event)
+
+        log.debug("Event added: %s", orm_event)
+
         await session.commit()
+
+        return None
 
     @connection
     async def update(
@@ -58,6 +70,8 @@ class EventRepository:
         )
         await session.commit()
 
+        log.warning("Event updated: %s", event)
+
     @connection
     async def delete(self, session: AsyncSession, event: EventDomain) -> None:
         existing = await self.get_by_owner(
@@ -73,6 +87,8 @@ class EventRepository:
             )
         )
         await session.commit()
+
+        log.warning("Event deleted: %s", event)
 
     @connection
     async def list_all(self, session: AsyncSession) -> list[EventDomain]:
