@@ -35,7 +35,9 @@ class EventRepository:
 
     @connection
     async def add(self, session: AsyncSession, event: EventDomain) -> None:
-        existing = await self.get_by_chat_id(event.chat_id, event.event_type)
+        existing = await self.get_by_chat_id(
+            chat_id=event.chat_id, event_type=event.event_type
+        )
         if existing:
             raise ValueError("Event already exists")
 

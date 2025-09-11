@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class User:
-    id: int
     chat_id: int
     username: str | None
+    first_name: str | None
+    last_name: str | None

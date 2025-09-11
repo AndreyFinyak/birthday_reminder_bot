@@ -18,10 +18,13 @@ class UserRepository:
         existing = await self.get_by_chat_id(user.chat_id)
         if existing:
             raise ValueError("User already exists")
+
         orm_user = user_to_orm(user)
+
         session.add(orm_user)
         await session.commit()
         await session.refresh(orm_user)
+
         return user_to_domain(orm_user)
 
     @connection

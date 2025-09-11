@@ -31,7 +31,7 @@ class EventService:
             owner=owner,
             event_date=event_date,
         )
-        await self.event_repository.add(event)
+        await self.event_repository.add(event=event)
 
         return event
 

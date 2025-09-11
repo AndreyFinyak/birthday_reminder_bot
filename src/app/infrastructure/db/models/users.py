@@ -17,6 +17,8 @@ class User(Base):
     )
     chat_id: Mapped[int] = mapped_column(Integer, unique=True, nullable=False)
     username: Mapped[str] = mapped_column(String(50), nullable=True)
+    first_name: Mapped[str] = mapped_column(String(50), nullable=True)
+    last_name: Mapped[str] = mapped_column(String(50), nullable=True)
 
     events: Mapped[list["Event"]] = relationship(
         "Event", back_populates="user", cascade="all, delete-orphan"
