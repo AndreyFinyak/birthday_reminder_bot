@@ -19,12 +19,12 @@ log = logging.getLogger(__name__)
 
 class EventRepository:
     @connection
-    async def get_by_owner(
-        self, session: AsyncSession, owner: str, event_type: EventType
+    async def get_by_chat_id(
+        self, session: AsyncSession, chat_id: int, event_type: EventType
     ) -> EventDomain | None:
         result = await session.execute(
             select(Event).where(
-                Event.owner == owner, Event.event_type == event_type
+                Event.chat_id == chat_id, Event.event_type == event_type
             )
         )
         event = result.scalar_one_or_none()
@@ -35,8 +35,8 @@ class EventRepository:
 
     @connection
     async def add(self, session: AsyncSession, event: EventDomain) -> None:
-        existing = await self.get_by_owner(
-            session, event.owner, event.event_type
+        existing = await self.get_by_chat_id(
+            session, event.chat_id, event.event_type
         )
         if existing:
             raise ValueError("Event already exists")
@@ -54,8 +54,8 @@ class EventRepository:
     async def update(
         self, session: AsyncSession, event: EventDomain, **kwargs
     ) -> None:
-        existing = await self.get_by_owner(
-            session, event.owner, event.event_type
+        existing = await self.get_by_chat_id(
+            session, event.chat_id, event.event_type
         )
         if not existing:
             raise ValueError("Event does not exist")
@@ -63,7 +63,7 @@ class EventRepository:
         await session.execute(
             sqlalchemy_update(Event)
             .where(
-                Event.owner == event.owner,
+                Event.chat_id == event.chat_id,
                 Event.event_type == event.event_type,
             )
             .values(**kwargs)
@@ -74,15 +74,15 @@ class EventRepository:
 
     @connection
     async def delete(self, session: AsyncSession, event: EventDomain) -> None:
-        existing = await self.get_by_owner(
-            session, event.owner, event.event_type
+        existing = await self.get_by_chat_id(
+            session, event.chat_id, event.event_type
         )
         if not existing:
             raise ValueError("Event does not exist")
 
         await session.execute(
             sqlalchemy_delete(Event).where(
-                Event.owner == event.owner,
+                Event.chat_id == event.chat_id,
                 Event.event_type == event.event_type,
             )
         )

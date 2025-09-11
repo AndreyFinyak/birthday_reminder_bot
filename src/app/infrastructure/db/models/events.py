@@ -18,8 +18,8 @@ class Event(Base):
     )
     event_date: Mapped[date] = mapped_column(Date, nullable=False)
 
-    user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("users.id"), nullable=False
+    chat_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.chat_id"), nullable=False
     )
 
     owner: Mapped[str] = mapped_column(String(50), nullable=False)

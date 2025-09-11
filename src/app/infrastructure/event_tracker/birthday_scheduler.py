@@ -44,11 +44,11 @@ class BirthdayScheduler:
 
         return all_messages
 
-    def start(self, notification_time: datetime.time):
+    async def start(self, notification_time: datetime.time):
         # планируем задачу каждый день в указанное время
         log.info("Starting birthday scheduler")
 
-        self.scheduler.add_job(
+        await self.scheduler.add_job(
             func=self.check_and_send_messages,
             trigger='cron',
             hour=notification_time.hour,

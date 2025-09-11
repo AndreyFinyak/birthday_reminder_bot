@@ -15,9 +15,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(
         Integer, primary_key=True, autoincrement=True, nullable=False
     )
-    telegram_id: Mapped[int] = mapped_column(
-        Integer, unique=True, nullable=False
-    )
+    chat_id: Mapped[int] = mapped_column(Integer, unique=True, nullable=False)
     username: Mapped[str] = mapped_column(String(50), nullable=True)
 
     events: Mapped[list["Event"]] = relationship(
