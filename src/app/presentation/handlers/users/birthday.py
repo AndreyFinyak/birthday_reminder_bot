@@ -2,6 +2,8 @@ import datetime
 import logging
 
 from aiogram import Dispatcher, types
+from aiogram.filters import Command
+from aiogram.filters.state import StateFilter
 from aiogram.fsm.context import FSMContext
 from pydantic import ValidationError
 
@@ -86,13 +88,12 @@ class BirthdayHandler:
         await message.reply(text_output)
 
     async def update_birthday(self, message: types.Message, state: FSMContext):
-        # Step 1: Ask which person to update
         chat_id = message.chat.id
         birthdays = await self.event_service.get_birthdays(chat_id=chat_id)
         if not birthdays:
             await message.reply("У вас нет сохранённых дней рождения.")
             return
-        # Show list of names
+
         owners = [bd.owner for bd in birthdays]
         owners_list = "\n".join(f"- {o}" for o in owners)
         await message.reply(
@@ -150,20 +151,26 @@ class BirthdayHandler:
         await state.clear()
 
     def register(self, dp: Dispatcher):
-        dp.message.register(self.cmd_add_birthday, commands=["add_birthday"])
-        dp.message.register(self.update_birthday, commands=["update_birthday"])
         dp.message.register(
-            self.process_owner, state=BirthdayStates.waiting_for_owner
+            self.cmd_add_birthday, Command(commands=["add_birthday"])
         )
         dp.message.register(
-            self.process_date, state=BirthdayStates.waiting_for_date
+            self.update_birthday, Command(commands=["update_birthday"])
+        )
+        dp.message.register(
+            self.process_owner, StateFilter(BirthdayStates.waiting_for_owner)
+        )
+        dp.message.register(
+            self.process_date, StateFilter(BirthdayStates.waiting_for_date)
         )
         dp.message.register(
             self.process_update_owner,
-            state=BirthdayStates.waiting_for_update_owner,
+            StateFilter(BirthdayStates.waiting_for_update_owner),
         )
         dp.message.register(
             self.process_update_date,
-            state=BirthdayStates.waiting_for_update_date,
+            StateFilter(BirthdayStates.waiting_for_update_date),
         )
-        dp.message.register(self.get_all_birthdays, commands=["all_birthdays"])
+        dp.message.register(
+            self.get_all_birthdays, Command(commands=["all_birthdays"])
+        )

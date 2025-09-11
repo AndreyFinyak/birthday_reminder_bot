@@ -19,6 +19,7 @@ class Container(containers.DeclarativeContainer):
     # Фоновые задачи
     birthday_scheduler = providers.Singleton(
         BirthdayScheduler,
+        bot=bot,
         event_repository=event_repository,
     )
 

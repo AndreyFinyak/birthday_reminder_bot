@@ -55,4 +55,7 @@ class EventService:
         )
 
     async def get_birthdays(self, chat_id: int) -> list[Event]:
-        return await self.event_repository.get_by_chat_id(chat_id)
+        return await self.event_repository.get_by_chat_id(
+            chat_id=chat_id,
+            event_type=EventType.BIRTHDAY,
+        )

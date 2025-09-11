@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import logging
 from collections import defaultdict
@@ -50,13 +51,13 @@ class BirthdayScheduler:
         return all_messages
 
     async def start(self, notification_time: datetime.time):
-        # планируем задачу каждый день в указанное время
         log.info("Starting birthday scheduler")
 
-        await self.scheduler.add_job(
-            func=self.check_and_send_messages,
+        self.scheduler.add_job(
+            func=lambda: asyncio.create_task(self.check_and_send_messages()),
             trigger='cron',
             hour=notification_time.hour,
             minute=notification_time.minute,
         )
+
         self.scheduler.start()

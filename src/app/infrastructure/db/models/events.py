@@ -1,7 +1,7 @@
 from datetime import date
 
 from sqlalchemy import Date, Enum, ForeignKey, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.domain.enums import EventType
 from app.infrastructure.db.models.base import Base
@@ -13,6 +13,8 @@ class Event(Base):
     id: Mapped[int] = mapped_column(
         Integer, primary_key=True, autoincrement=True
     )
+    user: Mapped["User"] = relationship("User", back_populates="events")
+
     event_type: Mapped["EventType"] = mapped_column(
         Enum(EventType), nullable=False
     )
