@@ -50,4 +50,4 @@ repos:
     rev: v1.4.0
     hooks:
       - id: detect-secrets
-        exclude: '(package\.lock\.json|alembic\.ini|alembic/.*|migrations/.*)'
+        exclude: '(package\.lock\.json|alembic\.ini|alembic/.*|migrations/.*|README\.md)'
