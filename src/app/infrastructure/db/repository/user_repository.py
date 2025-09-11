@@ -14,18 +14,21 @@ from app.infrastructure.db.models import User
 
 class UserRepository:
     @connection
-    async def add(self, user: UserDomain, session: AsyncSession) -> UserDomain:
-        existing = await self.get_by_chat_id(user.chat_id)
-        if existing:
-            raise ValueError("User already exists")
+    async def add(
+        self, user: UserDomain, session: AsyncSession
+    ) -> UserDomain | None:
+        existing = await self.get_by_chat_id(chat_id=user.chat_id)
 
-        orm_user = user_to_orm(user)
+        if existing:
+            return None
+
+        orm_user = user_to_orm(user=user)
 
         session.add(orm_user)
         await session.commit()
         await session.refresh(orm_user)
 
-        return user_to_domain(orm_user)
+        return user_to_domain(user=orm_user)
 
     @connection
     async def get_by_chat_id(

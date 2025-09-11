@@ -1,32 +1,40 @@
 import asyncio
 import logging
+from typing import Annotated
 
+from aiogram import Bot, Dispatcher
+from dependency_injector.wiring import Provide, inject
+
+from app.application.services.event_service import EventService
+from app.config.config import settings
 from app.config.containers import Container
-from app.presentation.handlers.users.birthday import BirthdayHandler
+from app.config.logging import configure_logging
+from app.presentation.handlers import BaseHandler, BirthdayHandler
 
-# Логирование
-logging.basicConfig(level=logging.INFO)
+configure_logging(settings.LOG_LEVEL)
 log = logging.getLogger(__name__)
 
 
-async def main():
-    # Создаём контейнер
-    container = Container()
-    container.init_resources()  # если используются ресурсы
-    container.wire(modules=[__name__])
+container = Container()
+container.wire(modules=[__name__])
 
-    # Берём объекты из контейнера
-    bot = container.bot()
-    dp = container.dispatcher()
-    event_service = container.event_service()
-    container.event_repository()
 
-    # Хендлер
-    birthday_handler = BirthdayHandler(event_service)
+@inject
+async def main(
+    birthday_handler: Annotated[
+        BirthdayHandler, Provide[Container.birthday_handler]
+    ],
+    base_handler: Annotated[BaseHandler, Provide[Container.base_handler]],
+    bot: Annotated[Bot, Provide[Container.bot]],
+    dp: Annotated[Dispatcher, Provide[Container.dispatcher]],
+    event_service: Annotated[EventService, Provide[Container.event_service]],
+):
+    # Регестрируем хендлеры
     birthday_handler.register(dp)
+    base_handler.register(dp)
 
     # Запуск планировщика через сервис
-    await event_service.start_scheduler()
+    await event_service.start_scheduler(hour=00, minute=1)
 
     # Запуск polling
     log.info("Bot started")
@@ -37,4 +45,6 @@ async def main():
 
 
 if __name__ == "__main__":
+    # Привязываем контейнер к текущему модулю
+    container.wire(modules=[__name__])
     asyncio.run(main())

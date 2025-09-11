@@ -14,8 +14,16 @@ class EventService:
         self.event_repository = event_repository
         self.birthday_scheduler = birthday_scheduler
 
-    async def start_scheduler(self) -> None:
-        notification_time = datetime.time(hour=9, minute=0)
+    async def start_scheduler(self, hour: int, minute: int) -> None:
+        notification_time = datetime.time(hour=hour, minute=minute)
+        await self.birthday_scheduler.start(
+            notification_time=notification_time
+        )
+
+        return None
+
+    async def stop_scheduler(self) -> None:
+        notification_time = datetime.time(hour=23, minute=30)
         await self.birthday_scheduler.start(
             notification_time=notification_time
         )
@@ -54,8 +62,8 @@ class EventService:
             chat_id=chat_id, owner=owner, event_type=event_type
         )
 
-    async def get_birthdays(self, chat_id: int) -> list[Event]:
-        return await self.event_repository.get_by_chat_id(
+    async def get_all_birthdays(self, chat_id: int) -> list[Event]:
+        return await self.event_repository.get_all(
             chat_id=chat_id,
             event_type=EventType.BIRTHDAY,
         )

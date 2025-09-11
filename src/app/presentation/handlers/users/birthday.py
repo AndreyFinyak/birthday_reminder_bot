@@ -80,7 +80,7 @@ class BirthdayHandler:
 
     async def get_all_birthdays(self, message: types.Message):
         chat_id = message.chat.id
-        birthdays = await self.event_service.get_birthdays(chat_id=chat_id)
+        birthdays = await self.event_service.get_all_birthdays(chat_id=chat_id)
         text_output = ""
         for bd in birthdays:
             text_output += f"{bd.owner} - {bd.event_date.isoformat()}\n"
@@ -89,7 +89,7 @@ class BirthdayHandler:
 
     async def update_birthday(self, message: types.Message, state: FSMContext):
         chat_id = message.chat.id
-        birthdays = await self.event_service.get_birthdays(chat_id=chat_id)
+        birthdays = await self.event_service.get_all_birthdays(chat_id=chat_id)
         if not birthdays:
             await message.reply("У вас нет сохранённых дней рождения.")
             return

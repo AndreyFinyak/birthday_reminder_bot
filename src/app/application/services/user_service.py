@@ -6,12 +6,12 @@ class UserService:
     def __init__(self, user_repository: UserRepository):
         self.user_repository = user_repository
 
-    async def add(
+    async def add_user(
         self,
         chat_id: int,
-        username: str,
-        first_name: str,
-        last_name: str,
+        username: str | None,
+        first_name: str | None,
+        last_name: str | None,
     ) -> User:
         user = User(
             chat_id=chat_id,
@@ -20,6 +20,4 @@ class UserService:
             last_name=last_name,
         )
 
-        await self.user_repository.add(user)
-
-        return user
+        return await self.user_repository.add(user=user)

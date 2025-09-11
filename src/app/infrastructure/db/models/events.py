@@ -1,10 +1,14 @@
 from datetime import date
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Date, Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.domain.enums import EventType
 from app.infrastructure.db.models.base import Base
+
+if TYPE_CHECKING:
+    from app.infrastructure.db.models.users import User
 
 
 class Event(Base):

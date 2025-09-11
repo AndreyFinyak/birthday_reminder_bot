@@ -20,12 +20,10 @@ log = logging.getLogger(__name__)
 class EventRepository:
     @connection
     async def get_by_chat_id(
-        self, session: AsyncSession, chat_id: int, event_type: EventType
+        self, session: AsyncSession, chat_id: int, owner: str
     ) -> EventDomain | None:
         result = await session.execute(
-            select(Event).where(
-                Event.chat_id == chat_id, Event.event_type == event_type
-            )
+            select(Event).where(Event.chat_id == chat_id, Event.owner == owner)
         )
         event = result.scalar_one_or_none()
 
@@ -36,7 +34,7 @@ class EventRepository:
     @connection
     async def add(self, session: AsyncSession, event: EventDomain) -> None:
         existing = await self.get_by_chat_id(
-            chat_id=event.chat_id, event_type=event.event_type
+            chat_id=event.chat_id, owner=event.owner
         )
         if existing:
             raise ValueError("Event already exists")
@@ -77,7 +75,7 @@ class EventRepository:
         owner: str,
         event_type: EventType,
     ) -> None:
-        existing = await self.get_by_chat_id(chat_id=chat_id)
+        existing = await self.get_by_chat_id(chat_id=chat_id, owner=owner)
         if not existing:
             raise ValueError("Event does not exist")
 
@@ -92,7 +90,20 @@ class EventRepository:
         log.warning("Owner deleted: %s", owner)
 
     @connection
+    async def get_all(
+        self, session: AsyncSession, chat_id: int, event_type: EventType
+    ) -> list[EventDomain]:
+        result = await session.execute(
+            select(Event)
+            .where(Event.chat_id == chat_id, Event.event_type == event_type)
+            .order_by(Event.event_date)
+        )
+        events = result.scalars().all()
+        return [event_to_domain(event) for event in events]
+
+    @connection
     async def list_all(self, session: AsyncSession) -> list[EventDomain]:
         result = await session.execute(select(Event))
         events = result.scalars().all()
+
         return [event_to_domain(event) for event in events]
