@@ -73,3 +73,9 @@ class EventRepository:
             )
         )
         await session.commit()
+
+    @connection
+    async def list_all(self, session: AsyncSession) -> list[EventDomain]:
+        result = await session.execute(select(Event))
+        events = result.scalars().all()
+        return [event_to_domain(event) for event in events]
