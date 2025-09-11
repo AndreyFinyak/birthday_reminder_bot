@@ -1,6 +1,8 @@
 import datetime
 import logging
+from collections import defaultdict
 
+from aiogram import Bot
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from app.domain.enums import EventType
@@ -16,7 +18,9 @@ class BirthdayScheduler:
     def __init__(
         self,
         event_repository: EventRepository,
+        bot: Bot,
     ):
+        self.bot = bot
         self.event_repository = event_repository
         self.scheduler = AsyncIOScheduler()
 
@@ -30,17 +34,18 @@ class BirthdayScheduler:
 
         return check
 
-    async def check_and_send_messages(self) -> list[str]:
+    async def check_and_send_messages(self) -> dict[int, list[str]]:
         events = await self.event_repository.list_all()
 
-        all_messages = []
-        counter = 0
+        all_messages: defaultdict[int, list[str]] = defaultdict(list)
 
         for event in events:
             if self.__check_good_date(event):
-                all_messages.append(f"{counter}. {event.owner}")
-                counter += 1
-        log.info("Today's birthday messages: %s", counter)
+                all_messages[event.chat_id].append(event.owner)
+
+        for chat_id, messages in all_messages.items():
+            await self.bot.send_message(chat_id, "\n".join(messages))
+        log.info("Today's birthday messages: %s", len(all_messages))
 
         return all_messages
 

@@ -52,43 +52,44 @@ class EventRepository:
 
     @connection
     async def update(
-        self, session: AsyncSession, event: EventDomain, **kwargs
+        self, session: AsyncSession, chat_id: int, owner: str, **kwargs
     ) -> None:
-        existing = await self.get_by_chat_id(
-            session, event.chat_id, event.event_type
-        )
+        existing = await self.get_by_chat_id(chat_id=chat_id, owner=owner)
         if not existing:
             raise ValueError("Event does not exist")
 
         await session.execute(
             sqlalchemy_update(Event)
-            .where(
-                Event.chat_id == event.chat_id,
-                Event.event_type == event.event_type,
-            )
+            .where(Event.chat_id == chat_id, Event.owner == owner)
             .values(**kwargs)
         )
         await session.commit()
 
-        log.warning("Event updated: %s", event)
+        log.warning("Updated: %s", owner)
+
+        return
 
     @connection
-    async def delete(self, session: AsyncSession, event: EventDomain) -> None:
-        existing = await self.get_by_chat_id(
-            session, event.chat_id, event.event_type
-        )
+    async def delete(
+        self,
+        session: AsyncSession,
+        chat_id: int,
+        owner: str,
+        event_type: EventType,
+    ) -> None:
+        existing = await self.get_by_chat_id(session, chat_id=chat_id)
         if not existing:
             raise ValueError("Event does not exist")
 
         await session.execute(
             sqlalchemy_delete(Event).where(
-                Event.chat_id == event.chat_id,
-                Event.event_type == event.event_type,
+                Event.chat_id == chat_id,
+                Event.event_type == event_type,
             )
         )
         await session.commit()
 
-        log.warning("Event deleted: %s", event)
+        log.warning("Owner deleted: %s", owner)
 
     @connection
     async def list_all(self, session: AsyncSession) -> list[EventDomain]:
