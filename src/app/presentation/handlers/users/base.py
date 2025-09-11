@@ -27,12 +27,13 @@ class BaseHandler:
             first_name=first_name,
             last_name=last_name,
         )
+
         if not new_user:
-            await message.answer(f"👋 Привет, {first_name}! 🎉😊")
-            log.info("Add new user: %s (%s)", username, chat_id)
-        else:
             await message.answer(f"🎉 С возвращением, {username}! 🙌😊")
             log.info("User already exists: %s (%s)", username, chat_id)
+        else:
+            await message.answer(f"👋 Привет, {first_name}! 🎉😊")
+            log.info("Add new user: %s (%s)", username, chat_id)
 
     async def cmd_help(self, message: types.Message) -> None:
         text = (
