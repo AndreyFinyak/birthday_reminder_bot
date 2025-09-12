@@ -44,7 +44,6 @@ cp .env.example .env
 BOT_TOKEN=<токен Telegram-бота>
 DATABASE_URL=postgresql+asyncpg://user:pass@localhost/dbname
 LOG_LEVEL=INFO
-SCHEDULER_ENABLED=true
 ```
 
 ---
@@ -70,21 +69,11 @@ alembic revision --autogenerate -m "описание изменений"
 poetry run python src/app/bot.py
 ```
 
-### Локально через venv + pip:
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-python src/app/bot.py
-```
-
 ### Docker (опционально)
 
 Пример `docker-compose.yml`:
 
 ```yaml
-version: '3.8'
-
 services:
   db:
     image: postgres:15
@@ -126,8 +115,6 @@ pytest
 
 - Ошибка `"got multiple values for argument 'session'"` → проверьте декораторы в `src/app/infrastructure/db/database.py`
 - Проблемы с подключением к БД → проверьте `DATABASE_URL` и доступность Postgres
-- Логи → смотрите `src/app/config/logging.py` и stdout контейнера
-
 ---
 
 ## Вклад и развитие
